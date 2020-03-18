@@ -1,1 +1,0 @@
-# AndroidStudioExercises2
