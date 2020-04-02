@@ -2,6 +2,7 @@ package com.example.asyncsimplehttprequest;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.util.Log;
@@ -30,9 +31,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-        StrictMode.setThreadPolicy(policy);
-
         textBox = (TextView) findViewById(R.id.textBox);
         addressField = (EditText) findViewById(R.id.addressField);
 
@@ -41,47 +39,52 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 String address = addressField.getText().toString();
-                FetchData(address);
+                new MyAsyncInnerClass().execute(address);
             }
         });
-
-
     }
 
-    private void FetchData(String address)
-    {
-        HttpURLConnection conn = null;
+    private class MyAsyncInnerClass extends AsyncTask<String, Void, String> {
 
+        protected String doInBackground(String... myUrl) {
 
-        try {
-            URL url = new URL(address);
-            conn = (HttpURLConnection) url.openConnection();
-        } catch(Exception e) {
-            Log.d(TAG, ("Something went wrong: " + e.toString()));
-            e.printStackTrace();
-        }
+            HttpURLConnection conn = null;
+            String resultString = null;
 
-        if(conn == null) return;
-
-        try {
-            InputStream in = new BufferedInputStream(conn.getInputStream());
-            BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-            StringBuilder total = new StringBuilder();
-            String line = null;
-            while((line = reader.readLine()) != null)
-            {
-                total.append(line).append('\n');
+            try {
+                URL url = new URL(myUrl[0]);
+                conn = (HttpURLConnection) url.openConnection();
+            } catch(Exception e) {
+                Log.d(TAG, ("Something went wrong: " + e.toString()));
+                e.printStackTrace();
             }
-            textBox.setText(total.toString());
-        } catch(Exception e) {
-            Log.d(TAG, ("Something went wrong: " + e.toString()));
-            e.printStackTrace();
-        } finally {
-            conn.disconnect();
+
+            if(conn == null) return "Connection error";
+
+            try {
+                InputStream in = new BufferedInputStream(conn.getInputStream());
+                BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+                StringBuilder total = new StringBuilder();
+                String line = null;
+                while((line = reader.readLine()) != null)
+                {
+                    total.append(line).append('\n');
+                }
+                resultString = total.toString();
+            } catch(Exception e) {
+                Log.d(TAG, ("Something went wrong: " + e.toString()));
+                e.printStackTrace();
+            } finally {
+                conn.disconnect();
+            }
+
+            return resultString;
         }
 
+        protected void onPostExecute(String result) {
+            textBox.setText(result);
+        }
 
     }
-
 
 }
