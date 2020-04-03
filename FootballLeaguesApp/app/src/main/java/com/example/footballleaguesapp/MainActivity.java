@@ -2,8 +2,11 @@ package com.example.footballleaguesapp;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
@@ -18,38 +21,60 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    private final String ERR = "ERROR_ERROR_ERROR";
-    private ListView leaguestListView;
+
+    private ListView countriesListView;
     private ArrayAdapter<String> aa;
-    private List<String> leagues;
+    private List<String> areaNamesList;
     private RequestQueue queue;
+    private HashMap<String,String> nameIdMap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        nameIdMap = new HashMap<String,String>();
+
         queue = Volley.newRequestQueue(this);
 
-        leagues = new ArrayList<>();
+        areaNamesList = new ArrayList<>();
 
-        aa = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, leagues);
+        aa = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, areaNamesList);
 
-        leaguestListView = (ListView) findViewById(R.id.leaguesList);
-        leaguestListView.setAdapter(aa);
+        countriesListView = (ListView) findViewById(R.id.countriesList);
+        countriesListView.setAdapter(aa);
 
-        String url = "https://api.football-data.org/v2/competitions?areas=2072";
+        countriesListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String name = areaNamesList.get(position);
+                String countryId = nameIdMap.get(name);
+                Log.d("ITEMCLICKEDALERT", "Name: " + name + " ID: " + countryId);
+                Intent intent = new Intent(MainActivity.this, LeaguesActivity.class);
+                intent.putExtra("MYKEY", countryId);
+                startActivity(intent);
+            }
+        });
+
+        String url = "https://api.football-data.org/v2/areas";
         JsonObjectRequest jsonReq = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 // Got a response
-                List<String> resultsList = parseLeagueNames(response);
-                leagues.clear();
-                leagues.addAll(resultsList);
+                List<Area> resultsList = MyParser.parseAreas(response);
+                List<String> areaNames = new ArrayList<>();
+                for(Area a : resultsList)
+                {
+                    nameIdMap.put(a.getName(), a.getId());
+                    areaNames.add(a.getName());
+                }
+                areaNamesList.clear();
+                areaNamesList.addAll(areaNames);
                 aa.notifyDataSetChanged();
             }
         }, new Response.ErrorListener() {
@@ -62,23 +87,5 @@ public class MainActivity extends AppCompatActivity {
         queue.add(jsonReq);
     }
 
-    private List<String> parseLeagueNames(JSONObject jObj)
-    {
-        List<String> list = new ArrayList<>();
 
-        try
-        {
-            JSONArray competitions = jObj.getJSONArray("competitions");
-            for(int i = 0; i < competitions.length(); i++)
-            {
-                String name = ((JSONObject)competitions.get(i)).getString("name");
-                list.add(name);
-            }
-        } catch(Exception e) {
-            Log.d(ERR, "Exception: " + e.toString());
-            e.printStackTrace();
-        }
-
-        return list;
-    }
 }
