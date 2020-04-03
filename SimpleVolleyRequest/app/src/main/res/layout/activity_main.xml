@@ -1,43 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_height="match_parent"
     android:layout_width="match_parent"
     android:orientation="vertical"
     >
 
-    <ListView
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:id="@+id/stocksList" />
-
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Stock Name"
-        android:id="@+id/stockNameField"
-        />
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
         >
 
         <EditText
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:hint="Stock ID"
-            android:id="@+id/stockIdField"
+            android:id="@+id/addressField"
             />
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:text="ADD"
-            android:id="@+id/stockAddButton"
+            android:text="GO"
+            android:paddingHorizontal="10dp"
+            android:id="@+id/fetchButton"
             />
+
     </LinearLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/textBox"
+        />
 
 </LinearLayout>

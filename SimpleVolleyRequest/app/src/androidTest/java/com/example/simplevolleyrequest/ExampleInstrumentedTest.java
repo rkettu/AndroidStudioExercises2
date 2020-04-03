@@ -1,4 +1,4 @@
-package com.example.stockmonitorapp;
+package com.example.simplevolleyrequest;
 
 import android.content.Context;
 
@@ -22,6 +22,6 @@ public class ExampleInstrumentedTest {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
 
-        assertEquals("com.example.stockmonitorapp", appContext.getPackageName());
+        assertEquals("com.example.simplevolleyrequest", appContext.getPackageName());
     }
 }
